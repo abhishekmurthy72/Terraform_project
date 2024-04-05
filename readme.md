@@ -24,7 +24,7 @@ Usage
     terraform init
 
 5.  **Edit Variables:** Open the `terraform.tfvars` file and edit the variables according to your requirements. You can change the AMI image, instance type, and any other variables defined in the file.
-6.  **Review Terraform Plan:** Run `terraform plan` to review the execution plan and ensure everything looks correct.
+6.  **Review Terraform Plan:** Run `terraform plan` to review the execution plan and ensure everything looks correct. 
 
     terraform plan
 
@@ -49,8 +49,3 @@ Contributing
 ------------
 
 Contributions are welcome! If you have any suggestions, improvements, or feature requests, feel free to open an issue or submit a pull request.
-
-License
--------
-
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
