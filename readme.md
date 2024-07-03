@@ -2,7 +2,7 @@
 Terraform AWS EC2 Instance Setup
 ================================
 
-This Terraform project automates the deployment of an EC2 instance on Amazon Web Services (AWS) using Ubuntu Linux as the default operating system and t2.micro as the default instance type. Users can easily customize the deployment by editing variables in the `terraform.tfvars` file and adding more resources in the `main.tf` file.
+This Terraform project automates the deployment of an EC2 instance on Amazon Web Services (AWS) using Ubuntu Linux as the default operating system and t2.micro as the default instance type. Users can easily customize the deployment by editing variables in the `terraform.tfvars` file and adding more resources in the `main.tf` file..
 
 Prerequisites
 -------------
