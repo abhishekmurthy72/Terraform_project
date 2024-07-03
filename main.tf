@@ -11,5 +11,5 @@ resource "aws_instance" "instance1" {
 
 resource "aws_s3_bucket" "abhishekmurthy72_bucket" {
     bucket = "abhishekmurthy-bucket-xyz"
-    force_destroy = true
+    force_destroy = false
 }
