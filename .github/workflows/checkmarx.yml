@@ -48,7 +48,7 @@ jobs:
         checkmarx_client_secret: ${{ secrets.CHECKMARX_CLIENT_SECRET }}
         base_uri: https://ast.checkmarx.net
         cx_tenant: ps_na_miguel_gonzalez
-        cx_client_id: ${{ variables.CLIENT_ID }}
+        cx_client_id: ${{ vars.CLIENT_ID }}
         cx_client_secret: ${{ secrets.SECRET }}
         project_name: ${{ github.repository }}
         scanners: sast
