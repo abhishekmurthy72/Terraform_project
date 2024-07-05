@@ -24,4 +24,3 @@ jobs:
                 repo_name:  ${{ github.event.repository.name }}
                 namespace:  ${{ github.repository_owner }}
                 pr_number: ${{ github.event.number }}
-            - name: Checkmarx AST Github Action
