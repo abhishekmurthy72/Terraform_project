@@ -15,7 +15,7 @@ name: Checkmarx Scan
 
 # Controls when the workflow will run
 on:
-  push:
+  create:
      branches: 
          - main
          - master
