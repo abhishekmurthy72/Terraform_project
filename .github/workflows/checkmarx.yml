@@ -19,7 +19,7 @@ jobs:
     - name: Checkmarx CxFlow Action
       uses: checkmarx-ts/checkmarx-cxflow-github-action@49d8269b14ca87910ba003d47a31fa0c7a11f2fe
       with:
-        args: --cx-project "AbhishekCX/Testing"
+        project-name: ${{ github.event.repository.name }}
         project: ${{ secrets.CHECKMARX_PROJECT }}
         team: ${{ secrets.CHECKMARX_TEAMS }}
         checkmarx_url: ${{ secrets.CHECKMARX_URL }}
