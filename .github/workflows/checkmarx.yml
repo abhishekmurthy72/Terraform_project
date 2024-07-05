@@ -48,8 +48,9 @@ jobs:
         checkmarx_client_secret: ${{ secrets.CHECKMARX_CLIENT_SECRET }}
         base_uri: https://ast.checkmarx.net
         cx_tenant: ps_na_miguel_gonzalez
-        cx_client_id: ${{ secrets.CX.CLIENT_ID }}
-        cx_client_secret: ${{ secrets.CX.CLIENT_SECRET }}
+        cx_client_id: ${{ variables.CLIENT_ID }}
+        cx_client_secret: ${{ secrets.SECRET }}
+        project_name: ${{ github.repository }}
         scanners: sast
         params: --namespace=${{ github.repository_owner }} --repo-name=${{ github.event.repository.name }} --branch=${{ github.ref }} --cx-flow.filter-severity --cx-flow.filter-category --checkmarx.disable-clubbing=true --repo-url=${{ github.event.repository.url }}
     # Upload the Report for CodeQL/Security Alerts
