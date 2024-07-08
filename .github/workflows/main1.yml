@@ -5,6 +5,11 @@ on:
          - main
          - master
          - dev
+ create:
+      branches: 
+          - main
+          - master
+          - dev
 jobs: 
     build:
         runs-on: ubuntu-latest
