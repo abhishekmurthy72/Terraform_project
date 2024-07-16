@@ -21,8 +21,8 @@ jobs:
               with:
                 base_uri: https://ast.checkmarx.net
                 cx_tenant: ps_na_miguel_gonzalez
-                cx_client_id: ${{ secrets.CX.CLIENT_ID }}
-                cx_client_secret: ${{ secrets.CX.CLIENT_SECRET }}
+                cx_client_id: ${{ secrets.CLIENT_ID }}
+                cx_client_secret: ${{ secrets.SECRET }}
                 project_name: ${{ github.repository }}
                 branch: ${{ github.head_ref || github.ref }}
                 github_token: ${{ github.token }}
