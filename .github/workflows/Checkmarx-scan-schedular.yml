@@ -3,7 +3,7 @@ on:
  schedule:
    - cron: "*/2 * * * *"
 jobs: 
-    build:
+     cron:
         runs-on: ubuntu-latest
         steps:
             - name: Checkmarx AST Github Action
