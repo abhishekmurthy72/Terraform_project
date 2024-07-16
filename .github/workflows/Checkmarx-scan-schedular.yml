@@ -1,4 +1,4 @@
-name: checkmarx AST Scan
+name: checkmarx Scan Schedular
 on: 
  schedule:
    - cron: "*/5 * * * *"
