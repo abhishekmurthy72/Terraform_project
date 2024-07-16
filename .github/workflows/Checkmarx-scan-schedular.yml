@@ -1,7 +1,7 @@
 name: checkmarx Scan Schedular
 on: 
  schedule:
-   - cron: "*/5 * * * *"
+   - cron: "*/2 * * * *"
 jobs: 
     build:
         runs-on: ubuntu-latest
