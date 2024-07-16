@@ -1,0 +1,21 @@
+name: checkmarx AST Scan
+on: 
+ schedule:
+   - cron: "*/5 * * * *"
+jobs: 
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkmarx AST Github Action
+              uses: Checkmarx/ast-github-action@2.0.23
+              with:
+                base_uri: https://ast.checkmarx.net
+                cx_tenant: ps_na_miguel_gonzalez
+                cx_client_id: ${{ secrets.CLIENT_ID }}
+                cx_client_secret: ${{ secrets.SECRET }}
+                project_name: ${{ github.repository }}
+                branch: ${{ github.head_ref || github.ref }}
+                github_token: ${{ github.token }}
+                repo_name:  ${{ github.event.repository.name }}
+                namespace:  ${{ github.repository_owner }}
+                pr_number: ${{ github.event.number }}
