@@ -6,7 +6,7 @@ on:
   workflow_dispatch:  # Allows manual triggering of the workflow
 
 jobs:
-  cx-ast-scan-schedular:
+  checkmarx-ast-scan:
     runs-on: ubuntu-latest
 
     steps:
@@ -18,8 +18,8 @@ jobs:
       with:
         python-version: '3.x'
 
-    - name: Install Checkmarx AST CLI
-      run: pip install checkmarx_ast_cli
+    - name: Install Dependencies
+      run: pip install checkmarx_python_sdk
 
     - name: Run Checkmarx AST Scan
       env:
@@ -31,18 +31,33 @@ jobs:
         CHECKMARX_TENANT: ${{ secrets.CX_TENANT }}
         DEFAULT_BRANCH_NAME: ${{ secrets.CX_DEFAULT_BRANCH_NAME }}
       run: |
-        cx configure --base-url $CHECKMARX_BASE_URL --base-auth-uri $CHECKMARX_BASE_AUTH_URL --client-id $CHECKMARX_CLIENT_ID --client-secret $CHECKMARX_CLIENT_SECRET
-        cx scan create --project-name $CHECKMARX_PROJECT_NAME --branch $DEFAULT_BRANCH_NAME --tenant $CHECKMARX_TENANT --file .
-
-    - name: Wait for Scan to Complete
-      run: |
-        SCAN_ID=$(cx scan list --project-id $CHECKMARX_PROJECT_ID --limit 1 --output json | jq -r '.[0].id')
-        cx scan status --scan-id $SCAN_ID --wait
-
-    - name: Get Scan Results
-      run: |
-        SCAN_ID=$(cx scan list --project-id $CHECKMARX_PROJECT_ID --limit 1 --output json | jq -r '.[0].id')
-        cx results show --scan-id $SCAN_ID --output json > scan_results.json
+            python -c "
+            import os
+            import json
+            from checkmarx_python_sdk.src.main import CxClient
+            
+            client = CxClient(
+                client_id=os.environ['CHECKMARX_CLIENT_ID'],
+                client_secret=os.environ['CHECKMARX_CLIENT_SECRET'],
+                base_url=os.environ['CHECKMARX_BASE_URL'],
+                base_auth_url=os.environ['CHECKMARX_BASE_AUTH_URL'],
+                tenant=os.environ['CHECKMARX_TENANT']
+            )
+            
+            project = client.get_project_by_name(os.environ['CHECKMARX_PROJECT_NAME'])
+            if not project:
+                raise Exception('Project not found')
+                
+            project_id = project['id']
+            scan = client.create_scan(project_id, os.environ['DEFAULT_BRANCH_NAME'])
+            scan_id = scan['id']
+            
+            client.wait_for_scan_completion(scan_id)
+            results = client.get_scan_results(scan_id)
+            
+            with open('scan_results.json', 'w') as f:
+                json.dump(results, f)
+            "
 
     - name: Upload Scan Results
       uses: actions/upload-artifact@v2
