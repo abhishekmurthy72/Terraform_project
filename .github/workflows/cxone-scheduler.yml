@@ -26,6 +26,7 @@ jobs:
     - name: Run Checkmarx Scan
       env:
         CX_REFRESH_TOKEN: ${{ secrets.CX_API_KEY }}
+        CX_PROJECT_ID: ${{ secrets.CX_PROJECT_ID }}
         CX_ORIGIN: GitHub Actions
         CX_INCREMENTAL_SCAN: "false"
         CX_PROJECT_NAME: abhishekmurthy72/Terraform_project
