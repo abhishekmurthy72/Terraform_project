@@ -32,7 +32,7 @@ jobs:
         CX_PROJECT_NAME: abhishekmurthy72/Terraform_project
         CX_REPO_URL: https://github.com/abhishekmurthy72/Terraform_project
         CX_BRANCH: Terraform-project-1
-        CX_USERNAME: ${{ secrets.GIT_USERNAME }}
+        CX_USERNAME: ${{ vars.GIT_USERNAME }}
         CX_API_KEY: ${{ secrets.GITHUB_TOKEN }}
       run: |
         python scheduler.py
