@@ -1,0 +1,51 @@
+name: Checkmarx AST Scan
+
+on:
+  schedule:
+    - cron: '0 0 * * 0'  # This will run the scan every Sunday at midnight UTC
+  workflow_dispatch:  # Allows manual triggering of the workflow
+
+jobs:
+  checkmarx-ast-scan:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+
+    - name: Install Checkmarx AST CLI
+      run: pip install checkmarx_ast_cli
+
+    - name: Run Checkmarx AST Scan
+      env:
+        CHECKMARX_CLIENT_ID: ${{ secrets.CX_CLIENT_ID }}
+        CHECKMARX_CLIENT_SECRET: ${{ secrets.CX_CLIENT_SECRET }}
+        CHECKMARX_PROJECT_NAME: ${{ secrets.CHECKMARX_PROJECT_NAME }}
+        CHECKMARX_BASE_URL: ${{ secrets.CHECKMARX_BASE_URL }}
+        CHECKMARX_BASE_AUTH_URL: ${{ secrets.CHECKMARX_BASE_AUTH_URL }}
+        CHECKMARX_TENANT: ${{ secrets.CX_TENANT }}
+        DEFAULT_BRANCH_NAME: ${{ secrets.CX_DEFAULT_BRANCH_NAME }}
+      run: |
+        cx configure --base-url $CHECKMARX_BASE_URL --base-auth-uri $CHECKMARX_BASE_AUTH_URL --client-id $CHECKMARX_CLIENT_ID --client-secret $CHECKMARX_CLIENT_SECRET
+        cx scan create --project-name $CHECKMARX_PROJECT_NAME --branch $DEFAULT_BRANCH_NAME --tenant $CHECKMARX_TENANT --file .
+
+    - name: Wait for Scan to Complete
+      run: |
+        SCAN_ID=$(cx scan list --project-id $CHECKMARX_PROJECT_ID --limit 1 --output json | jq -r '.[0].id')
+        cx scan status --scan-id $SCAN_ID --wait
+
+    - name: Get Scan Results
+      run: |
+        SCAN_ID=$(cx scan list --project-id $CHECKMARX_PROJECT_ID --limit 1 --output json | jq -r '.[0].id')
+        cx results show --scan-id $SCAN_ID --output json > scan_results.json
+
+    - name: Upload Scan Results
+      uses: actions/upload-artifact@v2
+      with:
+        name: scan-results
+        path: scan_results.json
