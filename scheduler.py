@@ -46,7 +46,7 @@ def main():
         payload = {
             'origin': cx_origin,
             'incrementalScan': cx_incremental_scan,
-            'projectName': cx_project_name,
+            'projectId': cx_project_name,
             'repoURL': cx_repo_url,
             'branch': cx_branch
         }
