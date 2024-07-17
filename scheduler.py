@@ -48,7 +48,7 @@ def main():
             'projectId': cx_project_id,
             'repoUrl': cx_repo_url,
             'branch': cx_branch,
-            'isIncremental': cx_incremental_scan.lower() == 'true'  # Convert to boolean
+            'isIncremental': cx_incremental_scan.lower() == 'false'  # Convert to boolean
         }
 
         # Log the headers and payload
@@ -58,7 +58,7 @@ def main():
         print(payload)
 
         # Send the request to the Checkmarx API
-        response = requests.post('https://ast.checkmarx.net/Scans', headers=headers, json=payload)
+        response = requests.post('https://ast.checkmarx.net/scans', headers=headers, json=payload)
         
         # Log the response status code and content
         print("Response status code:", response.status_code)
