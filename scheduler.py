@@ -1,114 +1,84 @@
-import os
 import requests
+import json
+import os
+from datetime import datetime, timedelta
 
-def get_access_token(refresh_token):
-    url = "https://iam.checkmarx.net/auth/realms/ps_na_miguel_gonzalez/protocol/openid-connect/token"
-    data = {
-        "grant_type": "refresh_token",
-        "client_id": "ast-app",
-        "refresh_token": refresh_token
+# Set up the environment variables
+CX_API_KEY = os.getenv('CX_API_KEY')
+CX_PROJECT_ID = os.getenv('CX_PROJECT_ID')
+CX_REFRESH_TOKEN = os.getenv('CX_REFRESH_TOKEN')
+CX_USERNAME = os.getenv('CX_USERNAME')
+CX_REPO_URL = os.getenv('CX_REPO_URL')
+CX_BRANCH = os.getenv('CX_BRANCH')
+
+# Headers for the request
+headers = {
+    'Authorization': f'Bearer {CX_REFRESH_TOKEN}',
+    'Content-Type': 'application/json',
+    'Accept': 'application/json; version=1.0'
+}
+
+# Calculate the start time as current time and end time as one day from now
+utc_epoch_start_time = int((datetime.utcnow() + timedelta(minutes=1)).timestamp())
+utc_epoch_end_time = int((datetime.utcnow() + timedelta(days=1)).timestamp())
+
+# Payload for the API request
+payload = {
+  "type": "git",
+  "handler": {
+    "branch": CX_BRANCH,
+    "repoUrl": CX_REPO_URL,
+    "credentials": {
+      "username": CX_USERNAME,
+      "type": "apiKey",
+      "value": CX_API_KEY
+    },
+    "skipSubModules": False
+  },
+  "project": {
+    "id": CX_PROJECT_ID,
+    "tags": {
+      "test": "",
+      "priority": "high"
     }
-    
-    response = requests.post(url, data=data)
-    response.raise_for_status()
-    return response.json()["access_token"]
+  },
+  "config": [
+    {
+      "type": "sast",
+      "value": {
+        "incremental": False,
+        "presetName": "Default"
+      }
+    },
+    {
+      "type": "sca"
+    },
+    {
+      "type": "kics"
+    },
+    {
+      "type": "apisec"
+    }
+  ],
+  "tags": {
+    "Scheduled Scan": "",
+    "priority": "high"
+  },
+  "cronString": "0 */3 * * * *",
+  "utcEpochStartTime": utc_epoch_start_time,
+  "utcEpochEndTime": utc_epoch_end_time
+}
 
-def main():
-    cx_refresh_token = os.getenv('CX_REFRESH_TOKEN')
-    cx_origin = os.getenv('CX_ORIGIN')
-    cx_incremental_scan = os.getenv('CX_INCREMENTAL_SCAN')
-    cx_project_id = os.getenv('CX_PROJECT_ID')
-    cx_repo_url = os.getenv('CX_REPO_URL')
-    cx_branch = os.getenv('CX_BRANCH')
-    cx_username = os.getenv('CX_USERNAME')
-    cx_api_key = os.getenv('CX_API_KEY')
+# Make the API request
+response = requests.post(
+    'https://ast.checkmarx.net/api/scans',
+    headers=headers,
+    data=json.dumps(payload)
+)
 
-    # Log environment variables
-    print("Environment variables:")
-    print(f"CX_REFRESH_TOKEN: {cx_refresh_token}")
-    print(f"CX_ORIGIN: {cx_origin}")
-    print(f"CX_INCREMENTAL_SCAN: {cx_incremental_scan}")
-    print(f"CX_PROJECT_ID: {cx_project_id}")
-    print(f"CX_REPO_URL: {cx_repo_url}")
-    print(f"CX_BRANCH: {cx_branch}")
-    print(f"CX_USERNAME: {cx_username}")
-    print(f"CX_API_KEY: {cx_api_key}")
-
-    try:
-        # Get access token using refresh token
-        access_token = get_access_token(cx_refresh_token)
-        print("Access token retrieved successfully")
-
-        # Construct the Checkmarx API request
-        headers = {
-            'Authorization': f'Bearer {access_token}',
-            'Content-Type': 'application/json',
-            'Accept': 'application/json; version=1.0',
-            'CorrelationId': ''
-        }
-
-        payload = {
-            "type": "git",
-            "handler": {
-                "branch": cx_branch,
-                "repoUrl": cx_repo_url,
-                "credentials": {
-                    "username": cx_username,
-                    "type": "apiKey",
-                    "value": cx_api_key
-                },
-                "skipSubModules": False
-            },
-            "project": {
-                "id": cx_project_id,
-                "tags": {
-                    "test": "",
-                    "priority": "high"
-                }
-            },
-            "config": [
-                {
-                    "type": "sast",
-                    "value": {
-                        "incremental": "false"
-                    }
-                },
-                {
-                    "type": "sca"
-                },
-                {
-                    "type": "kics"
-                },
-                {
-                    "type": "apisec"
-                }
-            ],
-            "tags": {
-                "Scheduled Scan": "",
-                "priority": "high"
-            }
-        }
-
-        # Log the headers and payload
-        print("Headers:")
-        print(headers)
-        print("Payload:")
-        print(payload)
-
-        # Send the request to the Checkmarx API
-        response = requests.post('https://ast.checkmarx.net/api/scans', headers=headers, json=payload)
-        
-        # Log the response status code and content
-        print("Response status code:", response.status_code)
-        print("Response content:", response.text)
-
-        response.raise_for_status()
-        print("Checkmarx scan initiated successfully")
-    except requests.exceptions.HTTPError as e:
-        print(f"HTTPError: {e}")
-        print("Response content:", response.content)
-    except Exception as e:
-        print(f"Error occurred: {e}")
-
-if __name__ == "__main__":
-    main()
+# Handle the response
+if response.status_code == 200:
+    print("Scan scheduled successfully.")
+else:
+    print(f"Failed to schedule scan. Status code: {response.status_code}")
+    print(f"Response content: {response.content}")
