@@ -20,8 +20,10 @@ def main():
     cx_project_id = os.getenv('CX_PROJECT_ID')
     cx_repo_url = os.getenv('CX_REPO_URL')
     cx_branch = os.getenv('CX_BRANCH')
-    cx_commit = os.getenv('CX_COMMIT')  # Ensure this is set in your environment variables
-    cx_tag = os.getenv('CX_TAG')        # Ensure this is set in your environment variables
+    cx_commit = os.getenv('CX_COMMIT')
+    cx_tag = os.getenv('CX_TAG')
+    cx_credentials_username = os.getenv('CX_CREDENTIALS_USERNAME')
+    cx_credentials_value = os.getenv('CX_REFRESH_TOKEN')
 
     # Log environment variables
     print("Environment variables:")
@@ -33,57 +35,72 @@ def main():
     print(f"CX_BRANCH: {cx_branch}")
     print(f"CX_COMMIT: {cx_commit}")
     print(f"CX_TAG: {cx_tag}")
+    print(f"CX_CREDENTIALS_USERNAME: {cx_credentials_username}")
+    print(f"CX_CREDENTIALS_VALUE: {cx_credentials_value}")
 
     try:
         # Get access token using refresh token
         access_token = get_access_token(cx_refresh_token)
         print("Access token retrieved successfully")
 
-        # Construct the Checkmarx API request
-        headers = {
-            'Authorization': f'Bearer {access_token}',
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'CorrelationId': ''
-        }
-
+        # Construct the Checkmarx API request payload
         payload = {
-            'type': 'git',
+            'type': 'gitupload',
             'handler': {
                 'branch': cx_branch,
-                'repoUrl': cx_repo_url
+                'repoUrl': cx_repo_url,
+                'credentials': {
+                    'username': cx_credentials_username,
+                    'type': 'apiKey',
+                    'value': cx_credentials_value
+                },
+                'skipSubModules': True
             },
-            'branch': cx_branch,
-            'repoUrl': cx_repo_url,
             'project': {
-                'id': cx_project_id
+                'id': cx_project_id,
+                'tags': {
+                    'test': '',
+                    'priority': 'high'
+                }
             },
             'config': [
                 {
                     'type': 'sast',
                     'value': {
-                        'incremental': cx_incremental_scan.lower() == 'false',
-                        'presetName': 'Default'  # Adjust as necessary
+                        'incremental': 'false',
+                        'presetName': 'Default'
                     }
                 }
-                # Add more config objects for other scanners if needed
-            ]
+            ],
+            'tags': {
+                'test': '',
+                'priority': 'high'
+            }
         }
 
-        # Add commit or tag if provided
+        # Add commit or tag to handler if provided
         if cx_commit:
             payload['handler']['commit'] = cx_commit
-        elif cx_tag:
+        if cx_tag:
             payload['handler']['tag'] = cx_tag
 
-        # Log the headers and payload
-        print("Headers:")
-        print(headers)
+        # Add incremental scan flag to config
+        payload['config'][0]['value']['incremental'] = cx_incremental_scan.lower()
+
+        # Log the payload
         print("Payload:")
         print(payload)
 
+        # Construct headers
+        headers = {
+            'Authorization': f'Bearer {access_token}',
+            'Content-Type': 'application/json',
+            'Accept': 'application/json; version=1.0',
+            'CorrelationId': ''
+        }
+
         # Send the request to the Checkmarx API
-        response = requests.post('https://ast.checkmarx.net/api/scans', headers=headers, json=payload)
+        response = requests.post('https://ast.checkmarx.net/api/Scans/', headers=headers, json=payload)
         
         # Log the response status code and content
         print("Response status code:", response.status_code)
