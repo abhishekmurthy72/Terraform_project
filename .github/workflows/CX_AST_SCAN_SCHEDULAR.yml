@@ -1,4 +1,4 @@
-name: CX AST SCHEDULAR
+name: Checkmarx AST Scan
 
 on:
   schedule:
@@ -19,7 +19,8 @@ jobs:
         python-version: '3.x'
 
     - name: Install Dependencies
-      run: pip install git+https://github.com/checkmarx-ts/checkmarx-python-sdk.git
+      run: |
+        pip install git+https://github.com/checkmarx-ts/checkmarx-python-sdk.git
 
     - name: Run Checkmarx AST Scan
       env:
@@ -34,7 +35,7 @@ jobs:
             python -c "
             import os
             import json
-            from checkmarx_python_sdk.src.main import CxClient
+            from checkmarx_python_sdk.cx import CxClient
             
             client = CxClient(
                 client_id=os.environ['CHECKMARX_CLIENT_ID'],
@@ -47,7 +48,7 @@ jobs:
             project = client.get_project_by_name(os.environ['CHECKMARX_PROJECT_NAME'])
             if not project:
                 raise Exception('Project not found')
-                
+            
             project_id = project['id']
             scan = client.create_scan(project_id, os.environ['DEFAULT_BRANCH_NAME'])
             scan_id = scan['id']
