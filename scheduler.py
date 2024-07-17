@@ -64,7 +64,7 @@ payload = {
     "Scheduled Scan": "",
     "priority": "high"
   },
-  "cronString": "0 */3 * * * *",
+  "cronString": "*/3 * * * *",
   "utcEpochStartTime": utc_epoch_start_time,
   "utcEpochEndTime": utc_epoch_end_time
 }
