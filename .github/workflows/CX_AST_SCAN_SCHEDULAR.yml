@@ -20,7 +20,13 @@ jobs:
 
     - name: Install Dependencies
       run: |
+        sudo apt-get update
+        sudo apt-get install -y git
         pip install git+https://github.com/checkmarx-ts/checkmarx-python-sdk.git
+
+    - name: Verify SDK Installation
+      run: |
+            python -c "import checkmarx_python_sdk; print(checkmarx_python_sdk.__version__)"
 
     - name: Run Checkmarx AST Scan
       env:
@@ -35,7 +41,7 @@ jobs:
             python -c "
             import os
             import json
-            from checkmarx_python_sdk.cx import CxClient
+            from checkmarx_python_sdk.client import CxClient
             
             client = CxClient(
                 client_id=os.environ['CHECKMARX_CLIENT_ID'],
