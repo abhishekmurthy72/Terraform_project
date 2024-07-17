@@ -29,7 +29,9 @@ jobs:
     - name: Verify SDK Installation
       run: |
         cd checkmarx-python-sdk
+        ls -l
         python -c "import checkmarx_python_sdk; print(checkmarx_python_sdk.__version__)"
+
 
     - name: Run Checkmarx AST Scan
       env:
