@@ -20,6 +20,8 @@ def main():
     cx_project_id = os.getenv('CX_PROJECT_ID')
     cx_repo_url = os.getenv('CX_REPO_URL')
     cx_branch = os.getenv('CX_BRANCH')
+    cx_commit = os.getenv('CX_COMMIT')  # Ensure this is set in your environment variables
+    cx_tag = os.getenv('CX_TAG')        # Ensure this is set in your environment variables
 
     # Log environment variables
     print("Environment variables:")
@@ -29,6 +31,8 @@ def main():
     print(f"CX_PROJECT_ID: {cx_project_id}")
     print(f"CX_REPO_URL: {cx_repo_url}")
     print(f"CX_BRANCH: {cx_branch}")
+    print(f"CX_COMMIT: {cx_commit}")
+    print(f"CX_TAG: {cx_tag}")
 
     try:
         # Get access token using refresh token
@@ -39,17 +43,38 @@ def main():
         headers = {
             'Authorization': f'Bearer {access_token}',
             'Content-Type': 'application/json',
-            'Accept': 'application/json; version=1.0',
+            'Accept': 'application/json',
             'CorrelationId': ''
         }
 
         payload = {
-            'origin': cx_origin,
-            'projectId': cx_project_id,
-            'repoUrl': cx_repo_url,
+            'type': 'git',
+            'handler': {
+                'branch': cx_branch,
+                'repoUrl': cx_repo_url
+            },
             'branch': cx_branch,
-            'isIncremental': cx_incremental_scan.lower() == 'false'  # Convert to boolean
+            'repoUrl': cx_repo_url,
+            'project': {
+                'id': cx_project_id
+            },
+            'config': [
+                {
+                    'type': 'sast',
+                    'value': {
+                        'incremental': cx_incremental_scan.lower() == 'false',
+                        'presetName': 'Default'  # Adjust as necessary
+                    }
+                }
+                # Add more config objects for other scanners if needed
+            ]
         }
+
+        # Add commit or tag if provided
+        if cx_commit:
+            payload['handler']['commit'] = cx_commit
+        elif cx_tag:
+            payload['handler']['tag'] = cx_tag
 
         # Log the headers and payload
         print("Headers:")
@@ -58,7 +83,7 @@ def main():
         print(payload)
 
         # Send the request to the Checkmarx API
-        response = requests.post('https://ast.checkmarx.net/api/Scans', headers=headers, json=payload)
+        response = requests.post('https://ast.checkmarx.net/api/scans', headers=headers, json=payload)
         
         # Log the response status code and content
         print("Response status code:", response.status_code)
