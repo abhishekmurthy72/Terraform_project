@@ -1,4 +1,4 @@
-name: Checkmarx AST Scan
+name: CX AST SCHEDULAR
 
 on:
   schedule:
@@ -19,7 +19,7 @@ jobs:
         python-version: '3.x'
 
     - name: Install Dependencies
-      run: pip install checkmarx_python_sdk
+      run: pip install git+https://github.com/checkmarx-ts/checkmarx-python-sdk.git
 
     - name: Run Checkmarx AST Scan
       env:
