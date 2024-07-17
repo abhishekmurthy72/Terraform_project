@@ -34,4 +34,5 @@ jobs:
         CX_BRANCH: Terraform-project-1
         CX_COMMIT: ${{ github.sha }}  # Use GitHub's commit SHA
         CX_TAG: ${{ github.ref }}     # Use GitHub's tag name (if applicable)
+        CX_CREDENTIALS_USERNAME: ${{ user.email }}
       run: python scheduler.py
