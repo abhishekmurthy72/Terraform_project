@@ -97,7 +97,7 @@ def main():
         print(payload)
 
         # Send the request to the Checkmarx API
-        response = requests.post('https://ast.checkmarx.net/api/Scans', headers=headers, json=payload)
+        response = requests.post('https://ast.checkmarx.net/api/scans', headers=headers, json=payload)
         
         # Log the response status code and content
         print("Response status code:", response.status_code)
