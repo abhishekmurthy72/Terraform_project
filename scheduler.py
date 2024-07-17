@@ -70,8 +70,7 @@ def main():
                 {
                     "type": "sast",
                     "value": {
-                        "incremental": cx_incremental_scan.lower() == 'true',
-                        "presetName": "Default"
+                        "incremental": cx_incremental_scan.lower() == 'false'
                     }
                 },
                 {
