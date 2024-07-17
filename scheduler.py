@@ -12,7 +12,9 @@ def main():
     # Construct the Checkmarx API request
     headers = {
         'Authorization': f'Bearer {cx_api_key}',
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Accept': 'application/json; version=1.0',
+        'CorrelationId': ''
     }
 
     payload = {
@@ -23,7 +25,16 @@ def main():
         'branch': cx_branch
     }
 
+    # Log the headers and payload
+    print("Headers:")
+    print(headers)
+    print("Payload:")
+    print(payload)
+
     response = requests.post('https://ast.checkmarx.net/api/scans', headers=headers, json=payload)
+    # Log the response status code and content
+    print("Response status code:", response.status_code)
+    print("Response content:", response.text)
     response.raise_for_status()
 
     print("Checkmarx scan initiated successfully")
