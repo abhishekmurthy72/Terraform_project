@@ -6,7 +6,7 @@ on:
   workflow_dispatch:  # Allows manual triggering of the workflow
 
 jobs:
-  checkmarx-ast-scan:
+  cx-ast-scan-schedular:
     runs-on: ubuntu-latest
 
     steps:
