@@ -23,16 +23,19 @@ jobs:
         python -m pip install --upgrade pip
         pip install requests
         
+    - name: Fetch GitHub user email
+      id: fetch-email
+      run: echo "email=$(git config user.email)" >> $GITHUB_ENV
+
     - name: Run Checkmarx Scan
       env:
         CX_REFRESH_TOKEN: ${{ secrets.CX_API_KEY }}
         CX_PROJECT_ID: ${{ secrets.CX_PROJECT_ID }}
-        CX_ORIGIN: GitHub Actions
+        CX_ORIGIN: GitHub Actions Scheduler
         CX_INCREMENTAL_SCAN: "false"
         CX_PROJECT_NAME: abhishekmurthy72/Terraform_project
         CX_REPO_URL: https://github.com/abhishekmurthy72/Terraform_project
         CX_BRANCH: Terraform-project-1
-        CX_COMMIT: ${{ github.sha }}  # Use GitHub's commit SHA
-        CX_TAG: ${{ github.ref }}     # Use GitHub's tag name (if applicable)
-        CX_CREDENTIALS_USERNAME: ${{ user.email }}
+        CX_USERNAME: ${{ env.email }}
+        CX_API_KEY: ${{ secrets.GITHUB_TOKEN }}
       run: python scheduler.py
