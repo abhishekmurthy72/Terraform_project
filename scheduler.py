@@ -20,6 +20,7 @@ def main():
     cx_project_name = os.getenv('CX_PROJECT_NAME')
     cx_repo_url = os.getenv('CX_REPO_URL')
     cx_branch = os.getenv('CX_BRANCH')
+    cx_project_id = os.getenv('CX_PROJECT_ID')
 
     # Log environment variables
     print("Environment variables:")
@@ -27,6 +28,7 @@ def main():
     print(f"CX_ORIGIN: {cx_origin}")
     print(f"CX_INCREMENTAL_SCAN: {cx_incremental_scan}")
     print(f"CX_PROJECT_NAME: {cx_project_name}")
+    print(f"CX_PROJECT_ID: {cx_project_id}")
     print(f"CX_REPO_URL: {cx_repo_url}")
     print(f"CX_BRANCH: {cx_branch}")
 
@@ -46,7 +48,7 @@ def main():
         payload = {
             'origin': cx_origin,
             'incrementalScan': cx_incremental_scan,
-            'projectId': cx_project_name,
+            'projectId': cx_project_id,
             'repoURL': cx_repo_url,
             'branch': cx_branch
         }
