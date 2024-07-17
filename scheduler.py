@@ -9,6 +9,15 @@ def main():
     cx_repo_url = os.getenv('CX_REPO_URL')
     cx_branch = os.getenv('CX_BRANCH')
 
+    # Log environment variables
+    print("Environment variables:")
+    print(f"CX_API_KEY: {cx_api_key}")
+    print(f"CX_ORIGIN: {cx_origin}")
+    print(f"CX_INCREMENTAL_SCAN: {cx_incremental_scan}")
+    print(f"CX_PROJECT_NAME: {cx_project_name}")
+    print(f"CX_REPO_URL: {cx_repo_url}")
+    print(f"CX_BRANCH: {cx_branch}")
+
     # Construct the Checkmarx API request
     headers = {
         'Authorization': f'Bearer {cx_api_key}',
@@ -31,13 +40,19 @@ def main():
     print("Payload:")
     print(payload)
 
+    # Send the request to the Checkmarx API
     response = requests.post('https://ast.checkmarx.net/api/scans', headers=headers, json=payload)
+    
     # Log the response status code and content
     print("Response status code:", response.status_code)
     print("Response content:", response.text)
-    response.raise_for_status()
 
-    print("Checkmarx scan initiated successfully")
+    try:
+        response.raise_for_status()
+        print("Checkmarx scan initiated successfully")
+    except requests.exceptions.HTTPError as e:
+        print(f"HTTPError: {e}")
+        print("Response content:", response.content)
 
 if __name__ == "__main__":
     main()
