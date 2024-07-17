@@ -22,11 +22,13 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y git
-        pip install git+https://github.com/checkmarx-ts/checkmarx-python-sdk.git
+        git clone https://github.com/checkmarx-ts/checkmarx-python-sdk.git
+        cd checkmarx-python-sdk
+        pip install .
 
     - name: Verify SDK Installation
       run: |
-            python -c "import checkmarx_python_sdk; print(checkmarx_python_sdk.__version__)"
+        python -c "import checkmarx_python_sdk; print(checkmarx_python_sdk.__version__)"
 
     - name: Run Checkmarx AST Scan
       env:
