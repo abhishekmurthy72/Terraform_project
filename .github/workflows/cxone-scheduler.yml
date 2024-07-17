@@ -32,4 +32,6 @@ jobs:
         CX_PROJECT_NAME: abhishekmurthy72/Terraform_project
         CX_REPO_URL: https://github.com/abhishekmurthy72/Terraform_project
         CX_BRANCH: Terraform-project-1
+        CX_COMMIT: ${{ github.sha }}  # Use GitHub's commit SHA
+        CX_TAG: ${{ github.ref }}     # Use GitHub's tag name (if applicable)
       run: python scheduler.py
