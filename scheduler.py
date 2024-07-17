@@ -18,10 +18,10 @@ def main():
     cx_origin = os.getenv('CX_ORIGIN')
     cx_incremental_scan = os.getenv('CX_INCREMENTAL_SCAN')
     cx_project_id = os.getenv('CX_PROJECT_ID')
-    git_repo_url = os.getenv('CX_REPO_URL')
-    git_branch = os.getenv('CX_BRANCH')
-    git_username = os.getenv('CX_USERNAME')
-    git_api_key = os.getenv('CX_API_KEY')
+    cx_repo_url = os.getenv('CX_REPO_URL')
+    cx_branch = os.getenv('CX_BRANCH')
+    cx_username = os.getenv('CX_USERNAME')
+    cx_api_key = os.getenv('CX_API_KEY')
 
     # Log environment variables
     print("Environment variables:")
@@ -29,10 +29,10 @@ def main():
     print(f"CX_ORIGIN: {cx_origin}")
     print(f"CX_INCREMENTAL_SCAN: {cx_incremental_scan}")
     print(f"CX_PROJECT_ID: {cx_project_id}")
-    print(f"CX_REPO_URL: {git_repo_url}")
-    print(f"CX_BRANCH: {git_branch}")
-    print(f"CX_USERNAME: {git_username}")
-    print(f"CX_API_KEY: {git_api_key}")
+    print(f"CX_REPO_URL: {cx_repo_url}")
+    print(f"CX_BRANCH: {cx_branch}")
+    print(f"CX_USERNAME: {cx_username}")
+    print(f"CX_API_KEY: {cx_api_key}")
 
     try:
         # Get access token using refresh token
@@ -50,12 +50,12 @@ def main():
         payload = {
             "type": "git",
             "handler": {
-                "branch": git_branch,
-                "repoUrl": git_repo_url,
+                "branch": cx_branch,
+                "repoUrl": cx_repo_url,
                 "credentials": {
-                    "username": git_username,
+                    "username": cx_username,
                     "type": "apiKey",
-                    "value": git_api_key
+                    "value": cx_api_key
                 },
                 "skipSubModules": False
             },
@@ -70,7 +70,7 @@ def main():
                 {
                     "type": "sast",
                     "value": {
-                        "incremental": cx_incremental_scan.lower() == 'true'
+                        "incremental": "false"
                     }
                 },
                 {
