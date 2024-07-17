@@ -65,7 +65,7 @@ payload = {
     "priority": "high"
   },
   "cronString": "*/3 * * * *",
-  "utcEpochStartTime": utc_epoch_start_time,
+  "utcEpochStartTime": 1721260800,
   "utcEpochEndTime": utc_epoch_end_time
 }
 
