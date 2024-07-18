@@ -62,9 +62,7 @@ payload = {
     "tags": {
         "Scheduled Scan": "",
         "priority": "high"
-    },
-    "cronString": "0 */2 * * * *", # Example cron string for every 3 minutes
-    "utc_epoch_start_time":"1721260800"
+    }
 }
 
 # Make the API request
