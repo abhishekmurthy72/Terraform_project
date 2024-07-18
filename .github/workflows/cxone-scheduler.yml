@@ -25,7 +25,7 @@ jobs:
         
     - name: Extract branch name
       id: extract_branch
-      run: echo "BRANCH_NAME=$(echo ${GITHUB_BASE_REF#refs/heads/})" >> $GITHUB_ENV
+      run: echo "BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
       
     - name: Run Checkmarx Scan
       env:
@@ -35,7 +35,7 @@ jobs:
         CX_INCREMENTAL_SCAN: "false"
         CX_PROJECT_NAME: ${{ github.repository }}
         CX_REPO_URL: ${{ github.server_url }}/${{ github.repository }}
-        CX_BRANCH: ${{ env.env.BRANCH_NAME }}
+        CX_BRANCH: ${{ env.BRANCH_NAME }}
         CX_USERNAME: ${{ vars.GIT_USERNAME }}
         CX_API_KEY: ${{ github.token }}
         CX_TENANT: ${{ vars.CX_TENANT }}
