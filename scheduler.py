@@ -1,8 +1,8 @@
 import os
 import requests
 
-def get_access_token(refresh_token,tenant):
-    url = "https://iam.checkmarx.net/auth/realms/{tenant}/protocol/openid-connect/token"
+def get_access_token(refresh_token, tenant):
+    url = f"https://iam.checkmarx.net/auth/realms/{tenant}/protocol/openid-connect/token"
     data = {
         "grant_type": "refresh_token",
         "client_id": "ast-app",
@@ -23,7 +23,7 @@ def main():
     cx_username = os.getenv('CX_USERNAME')
     cx_api_key = os.getenv('CX_API_KEY')
     cx_tenant = os.getenv('CX_TENANT')
-    
+
     # Log environment variables
     print("Environment variables:")
     print(f"CX_REFRESH_TOKEN: {cx_refresh_token}")
@@ -34,11 +34,11 @@ def main():
     print(f"CX_BRANCH: {cx_branch}")
     print(f"CX_USERNAME: {cx_username}")
     print(f"CX_API_KEY: {cx_api_key}")
-    print(f"CX_API_KEY: {cx_tenant}")
+    print(f"CX_TENANT: {cx_tenant}")
 
     try:
         # Get access token using refresh token
-        access_token = get_access_token(cx_refresh_token,cx_tenant)
+        access_token = get_access_token(cx_refresh_token, cx_tenant)
         print("Access token retrieved successfully")
 
         # Construct the Checkmarx API request
@@ -108,7 +108,7 @@ def main():
         print("Checkmarx scan initiated successfully")
     except requests.exceptions.HTTPError as e:
         print(f"HTTPError: {e}")
-        print("Response content:", response.content)
+        print("Response content:", e.response.content if e.response else 'No response content')
     except Exception as e:
         print(f"Error occurred: {e}")
 
