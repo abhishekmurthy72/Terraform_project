@@ -27,6 +27,12 @@ jobs:
       id: extract_branch
       run: echo "BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
       
+    - name: Fetch GitHub user email
+      id: fetch_email
+      run: |
+        email=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" https://api.github.com/user | jq -r .email)
+        echo "USER_EMAIL=${email}" >> $GITHUB_ENV
+      
     - name: Run Checkmarx Scan
       env:
         CX_REFRESH_TOKEN: ${{ secrets.CX_API_KEY }}
@@ -36,7 +42,7 @@ jobs:
         CX_PROJECT_NAME: ${{ github.repository }}
         CX_REPO_URL: ${{ github.server_url }}/${{ github.repository }}
         CX_BRANCH: ${{ env.BRANCH_NAME }}
-        CX_USERNAME: ${{ vars.GIT_USERNAME }}
+        CX_USERNAME: ${{ env.USER_EMAIL }}
         CX_API_KEY: ${{ github.token }}
         CX_TENANT: ${{ vars.CX_TENANT }}
       run: |
