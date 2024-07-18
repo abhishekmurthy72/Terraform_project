@@ -2,7 +2,7 @@ import os
 import requests
 
 def get_access_token(refresh_token, tenant):
-    url = "https://iam.checkmarx.net/auth/realms/{tenant}/protocol/openid-connect/token"
+    url = f"https://iam.checkmarx.net/auth/realms/{tenant}/protocol/openid-connect/token"
     data = {
         "grant_type": "refresh_token",
         "client_id": "ast-app",
@@ -35,9 +35,10 @@ def main():
     print(f"CX_USERNAME: {cx_username}")
     print(f"CX_API_KEY: {cx_api_key}")
     print(f"CX_TENANT: {cx_tenant}")
+
     try:
-        # Get access token using refresh token
-        access_token = get_access_token(cx_refresh_token ,cx_tenant)
+        # Get access token using refresh token and tenant
+        access_token = get_access_token(cx_refresh_token, cx_tenant)
         print("Access token retrieved successfully")
 
         # Construct the Checkmarx API request
