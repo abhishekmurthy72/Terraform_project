@@ -11,10 +11,6 @@ CX_USERNAME = os.getenv('CX_USERNAME')
 CX_REPO_URL = os.getenv('CX_REPO_URL')
 CX_BRANCH = os.getenv('CX_BRANCH')
 
-# Calculate UTC epoch start and end times
-utc_now = datetime.now(timezone.utc)
-utc_epoch_start_time = int((utc_now + timedelta(minutes=1)).timestamp())
-utc_epoch_end_time = int((utc_now + timedelta(days=1)).timestamp())
 
 # API endpoint and headers
 url = 'https://ast.checkmarx.net/api/scans'
@@ -67,7 +63,8 @@ payload = {
         "Scheduled Scan": "",
         "priority": "high"
     },
-    "cronString": "0 */3 * * * *"  # Example cron string for every 3 minutes
+    "cronString": "0 */3 * * * *", # Example cron string for every 3 minutes
+    "utc_epoch_start_time":"1721260800"
 }
 
 # Make the API request
