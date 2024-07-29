@@ -1,4 +1,4 @@
-name: Checkmarx Scan
+name: Checkmarx Python Script runner action
 
 on:
   # schedule:
