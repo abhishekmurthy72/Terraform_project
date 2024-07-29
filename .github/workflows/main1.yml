@@ -1,4 +1,4 @@
-name: checkmarx AST Test Scan
+name: checkmarx AST Plugin template
 on: 
  push:
      branches: 
