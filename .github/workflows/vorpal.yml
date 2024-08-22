@@ -18,6 +18,6 @@ jobs:
           source_path: "${{ steps.changed-files.outputs.all_changed_files }}"
           filter_mode: added
           github_token: ${{ secrets.github_token }}
-          reporter: github-pr-check
+          reporter: github-pr-check , github-pr-review
           level: error
-          fail_on_error: false
+          fail_on_error: true
