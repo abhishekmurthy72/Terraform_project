@@ -11,7 +11,7 @@ def get_access_token(refresh_token, tenant):
     
     response = requests.post(url, data=data)
     response.raise_for_status()
-    return response.json()["access_token"]
+    # return response.json()["access_token"]
 
 def main():
     cx_refresh_token = os.getenv('CX_REFRESH_TOKEN')
