@@ -1,5 +1,5 @@
 provider "aws" {
-  region = "us-east-1"
+  region = "us-east-1",
 }
 
 
@@ -16,3 +16,4 @@ resource "aws_s3_bucket" "abhishekmurthy72_bucket" {
     force_destroy = true
 }
 # nothing just test...
+# nothing just test
