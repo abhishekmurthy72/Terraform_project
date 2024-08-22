@@ -9,7 +9,7 @@ def get_access_token(refresh_token, tenant):
         "refresh_token": refresh_token
     }
     
-    response = requests.post(url, data=data)
+    response = requests.post(url, data=data, verify=False)  # SSL verification is disabled here
     response.raise_for_status()
     return response.json()["access_token"]
 
@@ -98,7 +98,7 @@ def main():
         print(payload)
 
         # Send the request to the Checkmarx API
-        response = requests.post('https://ast.checkmarx.net/api/scans', headers=headers, json=payload)
+        response = requests.post('https://ast.checkmarx.net/api/scans', headers=headers, json=payload, verify=False)  # SSL verification is disabled here too
         
         # Log the response status code and content
         print("Response status code:", response.status_code)
