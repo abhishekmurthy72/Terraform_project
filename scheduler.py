@@ -21,7 +21,10 @@ def main():
     cx_repo_url = os.getenv('CX_REPO_URL')
     cx_branch = os.getenv('CX_BRANCH')
     cx_username = os.getenv('CX_USERNAME')
-    cx_api_key = os.getenv('CX_API_KEY')
+
+    # Hardcoded API key (Vulnerability: Hardcoded sensitive data)
+    cx_api_key = "hardcoded-api-key-12345"  # Sensitive API key hardcoded
+    
     cx_tenant = os.getenv('CX_TENANT')
 
     # Log environment variables
@@ -37,9 +40,14 @@ def main():
     print(f"CX_TENANT: {cx_tenant}")
 
     try:
-        # Get access token using refresh token
-        access_token = get_access_token(cx_refresh_token, cx_tenant)
-        print("Access token retrieved successfully")
+        # Bypass authentication if the refresh token is not available (Vulnerability: Weak authentication mechanism)
+        if cx_refresh_token is None:
+            print("CX_REFRESH_TOKEN not found. Bypassing token retrieval.")
+            access_token = "dummy-access-token"  # This should never be done
+        else:
+            # Get access token using refresh token
+            access_token = get_access_token(cx_refresh_token, cx_tenant)
+            print("Access token retrieved successfully")
 
         # Construct the Checkmarx API request
         headers = {
