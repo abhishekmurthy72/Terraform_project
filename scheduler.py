@@ -41,7 +41,7 @@ def main():
         access_token = get_access_token(cx_refresh_token, cx_tenant)
         print("Access token retrieved successfully")
 
-        # Construct the Checkmarx API request
+        # Construct the Checkmarx API . Testing
         headers = {
             'Authorization': f'Bearer {access_token}',
             'Content-Type': 'application/json',
