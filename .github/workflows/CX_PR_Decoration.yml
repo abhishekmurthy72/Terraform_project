@@ -1,0 +1,139 @@
+# GitHub Actions Workflow to automate & integrate Checkmarx security scans
+# 
+# These environment variables can be overridden in your GitHub repository settings or workflow files.
+#
+# For more information, visit: https://checkmarx.com/resource/documents/en/34965-68722-checkmarx-one-gitlab-integration.html
+#
+
+name: Checkmarx Scan PR Decoration
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize]
+
+env:
+  CX_BRANCH_NAME: ${{ github.ref_name }}
+  CX_PROJECT_NAME: ${{ github.event.repository.name }}
+  CX_BASE_URI: ${{ secrets.CX_BASE_URI }}
+  CX_TENANT: ${{ secrets.CX_TENANT }}
+  CX_CLIENT_ID: ${{ secrets.CX_CLIENT_ID }}
+  CX_CLIENT_SECRET: ${{ secrets.CX_CLIENT_SECRET }}
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  CX_ADDITIONAL_PARAMS: ""
+  CX_FILE_FILTERS: ""
+  CHECKMARX_DOCKER_IMAGE: "ast-cli"
+  SECURITY_DASHBOARD: "false"
+  SECURITY_DASHBOARD_ON_PR: "false"
+
+jobs:
+  checkmarx_scan:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && env.SECURITY_DASHBOARD != 'true'
+    container: checkmarx/${{ env.CHECKMARX_DOCKER_IMAGE }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Run Checkmarx Scan
+        run: |
+          args=(${CX_ADDITIONAL_PARAMS})
+          /app/bin/cx scan create \
+            --project-name ${CX_PROJECT_NAME} \
+            --file-source '.' \
+            --scan-info-format 'json' \
+            --branch ${CX_BRANCH_NAME} \
+            --agent 'GitHub' \
+            --file-filter "${CX_FILE_FILTERS}" \
+            "${args[@]}"
+
+  mr_checkmarx_scan:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' && env.SECURITY_DASHBOARD_ON_PR != 'true'
+    container: checkmarx/${{ env.CHECKMARX_DOCKER_IMAGE }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Run Checkmarx Scan and Create PR Decoration
+        run: |
+          args=(${CX_ADDITIONAL_PARAMS})
+          output_file=./output.log
+          /app/bin/cx scan create \
+            --project-name ${CX_PROJECT_NAME} \
+            --file-source '.' \
+            --scan-info-format 'json' \
+            --branch ${CX_BRANCH_NAME} \
+            --agent 'GitHub' \
+            --file-filter "${CX_FILE_FILTERS}" \
+            "${args[@]}" | tee -i $output_file
+
+          exit_status=${PIPESTATUS[0]}
+          scanId=$(grep -E '"(ID)":"((\\"|[^"])*)"' $output_file | cut -d',' -f1 | cut -d':' -f2 | tr -d '"')
+
+          if [ -n "$scanId" ]; then
+            echo "Creating PR decoration for scan ID:" $scanId
+            /app/bin/cx utils pr github --repo-name ${{ github.repository }} --pr-number ${{ github.event.number }} --scan-id $scanId --token $GITHUB_TOKEN
+          else
+            echo "PR decoration not created."
+          fi
+
+          exit $exit_status
+
+  mr_checkmarx_scan_security_dashboard:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' && env.SECURITY_DASHBOARD_ON_PR == 'true'
+    container: checkmarx/${{ env.CHECKMARX_DOCKER_IMAGE }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Run Checkmarx Scan with Security Dashboard Report
+        run: |
+          args=(${CX_ADDITIONAL_PARAMS})
+          output_file=./output.log
+          /app/bin/cx scan create \
+            --project-name ${CX_PROJECT_NAME} \
+            --file-source '.' \
+            --scan-info-format 'json' \
+            --branch ${CX_BRANCH_NAME} \
+            --agent 'GitHub' \
+            --report-format gl-sast,gl-sca \
+            --file-filter "${CX_FILE_FILTERS}" \
+            "${args[@]}" | tee -i $output_file
+
+          scanId=$(grep -E '"(ID)":"((\\"|[^"])*)"' $output_file | cut -d',' -f1 | cut -d':' -f2 | tr -d '"')
+
+          if [ -n "$scanId" ]; then
+            echo "Creating PR decoration for scan ID:" $scanId
+            /app/bin/cx utils pr github --repo-name ${{ github.repository }} --pr-number ${{ github.event.number }} --scan-id $scanId --token $GITHUB_TOKEN
+          else
+            echo "PR decoration not created."
+          fi
+
+  checkmarx_scan_security_dashboard:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && env.SECURITY_DASHBOARD == 'true'
+    container: checkmarx/${{ env.CHECKMARX_DOCKER_IMAGE }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Run Checkmarx Scan with Security Dashboard Report
+        run: |
+          args=(${CX_ADDITIONAL_PARAMS})
+          /app/bin/cx scan create \
+            --project-name ${CX_PROJECT_NAME} \
+            --file-source '.' \
+            --scan-info-format 'json' \
+            --branch ${CX_BRANCH_NAME} \
+            --agent 'GitHub' \
+            --report-format gl-sast,gl-sca \
+            --file-filter "${CX_FILE_FILTERS}" \
+            "${args[@]}"
