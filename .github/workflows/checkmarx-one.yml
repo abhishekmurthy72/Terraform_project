@@ -46,7 +46,7 @@ jobs:
       - name: Checkmarx One scan
         uses: checkmarx/ast-github-action@main
         with:
-          base_uri: https://ast.checkmarx.net
+          base_uri: https://ind.ast.checkmarx.net
           cx_client_id: ${{ vars.CLIENT_ID }}
           cx_client_secret: ${{ secrets.SECRET }}
           cx_tenant: ${{ vars.TENANT }}
