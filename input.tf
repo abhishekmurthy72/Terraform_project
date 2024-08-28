@@ -14,4 +14,4 @@ variable "instance_type_value" {
  # description = "Default Linux of AMI"
   #type = string
   #default = "t2.micro"
-#}
+#}.
