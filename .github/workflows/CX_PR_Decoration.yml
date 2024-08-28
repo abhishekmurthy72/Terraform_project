@@ -3,7 +3,7 @@
 # These environment variables can be overridden in your GitHub repository settings or workflow files.
 #
 # For more information, visit: https://checkmarx.com/resource/documents/en/34965-68722-checkmarx-one-gitlab-integration.html
-#
+
 
 name: Checkmarx Scan PR Decoration
 
