@@ -43,7 +43,7 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # This step checks out a copy of your repository.
+      # This step checks out a copy of your repository..
       - name: Checkout repository
         uses: actions/checkout@v4
       # This step creates the Checkmarx One scan
