@@ -1,4 +1,5 @@
 import os
+import ast
 import requests
 API_KEY= "dwx2edwe34fBDSKJ32edxwq3edxkdeW23"
 def get_access_token(refresh_token, tenant):
@@ -114,3 +115,16 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+def calculate_expression(expr):
+    # Use ast.literal_eval for safer evaluation
+    try:
+        # Only allows literals like numbers and strings
+        return ast.literal_eval(expr)
+    except (ValueError, SyntaxError):
+        return "Invalid expression"
+
+user_input = input("Enter a mathematical expression: ")
+result = calculate_expression(user_input)
+print(f"The result is: {result}")
