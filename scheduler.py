@@ -117,3 +117,29 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+import sqlite3
+
+def get_user_details(user_id):
+    # Connect to the database
+    conn = sqlite3.connect('example.db')
+    cursor = conn.cursor()
+    
+    # Unsafe query construction
+    query = f"SELECT * FROM users WHERE id = {user_id}"
+    cursor.execute(query)
+    
+    # Fetch the result
+    result = cursor.fetchall()
+    
+    # Close the connection
+    conn.close()
+    
+    return result
+
+# Get user input
+user_id = input("Enter user ID: ")
+details = get_user_details(user_id)
+print(details)
+
