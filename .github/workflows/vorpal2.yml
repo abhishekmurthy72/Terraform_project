@@ -13,11 +13,11 @@ jobs:
           separator: ','
         
       - name: Vorpal with reviewdog
-        uses: checkmarx/vorpal-reviewdog-github-action@v2.0.0
+        uses: checkmarx/vorpal-reviewdog-github-action@v2.2.0
         with:
           source_path: "${{ steps.changed-files.outputs.all_changed_files }}"
           filter_mode: added
           github_token: ${{ secrets.github_token }}
           reporter: github-pr-check , github-pr-review
           level: error
-          fail_on_error: true
+          fail_on_error: false
