@@ -1,79 +1,79 @@
-name: Checkmarx AST Scan
+# name: Checkmarx AST Scan
 
-on:
-  schedule:
-    - cron: '0 0 * * 0'  # This will run the scan every Sunday at midnight UTC
-  workflow_dispatch:  # Allows manual triggering of the workflow
+# on:
+#   schedule:
+#     - cron: '0 0 * * 0'  # This will run the scan every Sunday at midnight UTC
+#   workflow_dispatch:  # Allows manual triggering of the workflow
 
-jobs:
-  checkmarx-ast-scan:
-    runs-on: ubuntu-latest
+# jobs:
+#   checkmarx-ast-scan:
+#     runs-on: ubuntu-latest
 
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+#     steps:
+#     - name: Checkout code
+#       uses: actions/checkout@v2
 
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.x'
+#     - name: Set up Python
+#       uses: actions/setup-python@v2
+#       with:
+#         python-version: '3.x'
 
-    - name: Install Dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y git
-        git clone https://github.com/checkmarx-ts/checkmarx-python-sdk.git
-        cd checkmarx-python-sdk
-        python -m pip install .
+#     - name: Install Dependencies
+#       run: |
+#         sudo apt-get update
+#         sudo apt-get install -y git
+#         git clone https://github.com/checkmarx-ts/checkmarx-python-sdk.git
+#         cd checkmarx-python-sdk
+#         python -m pip install .
 
-    - name: Verify SDK Installation
-      run: |
-        cd checkmarx-python-sdk
-        export PYTHONPATH=/opt/hostedtoolcache/Python/3.12.4/x64/lib/python3.12/site-packages:$PYTHONPATH
-        python -c "import checkmarx_python_sdk; print(checkmarx_python_sdk.__version__)"
+#     - name: Verify SDK Installation
+#       run: |
+#         cd checkmarx-python-sdk
+#         export PYTHONPATH=/opt/hostedtoolcache/Python/3.12.4/x64/lib/python3.12/site-packages:$PYTHONPATH
+#         python -c "import checkmarx_python_sdk; print(checkmarx_python_sdk.__version__)"
 
-    - name: Run Checkmarx AST Scan
-      env:
-        CHECKMARX_CLIENT_ID: ${{ secrets.CX_CLIENT_ID }}
-        CHECKMARX_CLIENT_SECRET: ${{ secrets.CX_CLIENT_SECRET }}
-        CHECKMARX_PROJECT_NAME: ${{ secrets.CHECKMARX_PROJECT_NAME }}
-        CHECKMARX_BASE_URL: ${{ secrets.CHECKMARX_BASE_URL }}
-        CHECKMARX_BASE_AUTH_URL: ${{ secrets.CHECKMARX_BASE_AUTH_URL }}
-        CHECKMARX_TENANT: ${{ secrets.CX_TENANT }}
-        DEFAULT_BRANCH_NAME: ${{ secrets.CX_DEFAULT_BRANCH_NAME }}
-      run: |
-        cd checkmarx-python-sdk
-        export PYTHONPATH=/opt/hostedtoolcache/Python/3.12.4/x64/lib/python3.12/site-packages:$PYTHONPATH
-        python -c "
-        import os
-        import json
-        from checkmarx_python_sdk.client import CxClient
+#     - name: Run Checkmarx AST Scan
+#       env:
+#         CHECKMARX_CLIENT_ID: ${{ secrets.CX_CLIENT_ID }}
+#         CHECKMARX_CLIENT_SECRET: ${{ secrets.CX_CLIENT_SECRET }}
+#         CHECKMARX_PROJECT_NAME: ${{ secrets.CHECKMARX_PROJECT_NAME }}
+#         CHECKMARX_BASE_URL: ${{ secrets.CHECKMARX_BASE_URL }}
+#         CHECKMARX_BASE_AUTH_URL: ${{ secrets.CHECKMARX_BASE_AUTH_URL }}
+#         CHECKMARX_TENANT: ${{ secrets.CX_TENANT }}
+#         DEFAULT_BRANCH_NAME: ${{ secrets.CX_DEFAULT_BRANCH_NAME }}
+#       run: |
+#         cd checkmarx-python-sdk
+#         export PYTHONPATH=/opt/hostedtoolcache/Python/3.12.4/x64/lib/python3.12/site-packages:$PYTHONPATH
+#         python -c "
+#         import os
+#         import json
+#         from checkmarx_python_sdk.client import CxClient
         
-        client = CxClient(
-            client_id=os.environ['CHECKMARX_CLIENT_ID'],
-            client_secret=os.environ['CHECKMARX_CLIENT_SECRET'],
-            base_url=os.environ['CHECKMARX_BASE_URL'],
-            base_auth_url=os.environ['CHECKMARX_BASE_AUTH_URL'],
-            tenant=os.environ['CHECKMARX_TENANT']
-        )
+#         client = CxClient(
+#             client_id=os.environ['CHECKMARX_CLIENT_ID'],
+#             client_secret=os.environ['CHECKMARX_CLIENT_SECRET'],
+#             base_url=os.environ['CHECKMARX_BASE_URL'],
+#             base_auth_url=os.environ['CHECKMARX_BASE_AUTH_URL'],
+#             tenant=os.environ['CHECKMARX_TENANT']
+#         )
         
-        project = client.get_project_by_name(os.environ['CHECKMARX_PROJECT_NAME'])
-        if not project:
-            raise Exception('Project not found')
+#         project = client.get_project_by_name(os.environ['CHECKMARX_PROJECT_NAME'])
+#         if not project:
+#             raise Exception('Project not found')
         
-        project_id = project['id']
-        scan = client.create_scan(project_id, os.environ['DEFAULT_BRANCH_NAME'])
-        scan_id = scan['id']
+#         project_id = project['id']
+#         scan = client.create_scan(project_id, os.environ['DEFAULT_BRANCH_NAME'])
+#         scan_id = scan['id']
         
-        client.wait_for_scan_completion(scan_id)
-        results = client.get_scan_results(scan_id)
+#         client.wait_for_scan_completion(scan_id)
+#         results = client.get_scan_results(scan_id)
         
-        with open('scan_results.json', 'w') as f:
-            json.dump(results, f)
-        "
+#         with open('scan_results.json', 'w') as f:
+#             json.dump(results, f)
+#         "
 
-    - name: Upload Scan Results
-      uses: actions/upload-artifact@v2
-      with:
-        name: scan-results
-        path: checkmarx-python-sdk/scan_results.json
+#     - name: Upload Scan Results
+#       uses: actions/upload-artifact@v2
+#       with:
+#         name: scan-results
+#         path: checkmarx-python-sdk/scan_results.json
