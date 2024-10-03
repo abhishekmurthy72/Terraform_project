@@ -41,7 +41,7 @@ jobs:
 
       - name: Check Checkmarx One server health
         run: |
-          response=$(curl -s -o /dev/null -w "%{http_code}" https://ind.ast.checkmarx.net/health)
+          response=$(curl -s -o /dev/null -w "%{http_code}" https://ind-status.ast.checkmarx.net/)
           if [ "$response" != "200" ]; then
             echo "Checkmarx One server is down. Proceeding without breaking the build."
             exit 0  # Do not fail the build
