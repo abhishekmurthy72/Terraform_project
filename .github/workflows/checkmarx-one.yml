@@ -10,38 +10,44 @@
 
 # This is a basic workflow to help you get started with Using Checkmarx One Action,
 # documentation can be found here : https://checkmarx.com/resource/documents/en/34965-68702-checkmarx-one-github-actions.html
-
 name: Checkmarx One Code Scanning Alerts
 
 on:
   push:
-     branches: 
-         - main
-         - master
-         - dev
-         - Terraform-project-1
-         
+    branches: 
+      - main
+      - master
+      - dev
+      - Terraform-project-1
   pull_request:
     types: [opened, reopened, synchronize]
     branches: [ "Terraform-project-1" ]
 
 permissions:
   contents: read
-  pull-requests: write  # <-- Add this line to allow PR decorations
+  pull-requests: write
 
 jobs:
   build:
     permissions:
-      contents: read # for actions/checkout to fetch code
-      # security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
-      # actions: read # only required for a private repository by github/codeql-action/upload-sarif
-      pull-requests: write # <-- Add this line to allow PR decorations
+      contents: read
+      pull-requests: write
 
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Check Checkmarx One server health
+        run: |
+          response=$(curl -s -o /dev/null -w "%{http_code}" https://ind.ast.checkmarx.net/health)
+          if [ "$response" != "200" ]; then
+            echo "Checkmarx One server is down. Proceeding without breaking the build."
+            exit 0  # Do not fail the build
+          else
+            echo "Checkmarx One server is healthy. Proceeding with scan."
+          fi
 
       - name: Checkmarx One scan
         uses: checkmarx/ast-github-action@main
