@@ -37,40 +37,28 @@ jobs:
           cat <<'EOF' > scrape_checkmarx.py
           import requests
           from bs4 import BeautifulSoup
-
+          
+          # URL of the status page
           url = "https://eu-status.ast.checkmarx.net/"
+          
           try:
+              # Send a GET request to fetch the HTML content
               response = requests.get(url)
-              response.raise_for_status()  # Raise an error for bad responses
-              
-              # Parse the HTML content using BeautifulSoup
+              response.raise_for_status()  # Check for request errors
+          
+              # Parse the HTML content
               soup = BeautifulSoup(response.text, 'html.parser')
+          
+              # Locate the status element based on its HTML structure
+              status_element = soup.find('aside', class_='operational state-bar')
               
-              # Extract the desired information; you may need to adjust this
-              status_element = soup.find("div", class_="status")  # Adjust selector based on actual page structure
-
-              if status_element:
-                  status = status_element.text.strip()
+              # Check if the status is operational
+              if status_element and 'Operating Normally' in status_element.text:
+                  print("The status is operational.")
               else:
-                  status = "No status found"
-                  print("Status element not found. Here is the full HTML response:")
-                  print(soup.prettify())  # Log the entire HTML for debugging
-
-              print(f"Scraped status: {status}")
-              
-              if "down" in status.lower():  # Adjust logic as necessary
-                  print("Checkmarx server is down. Proceeding without breaking the build.")
-                  exit(0)
-
+                  print("The status is not operational.")
           except requests.exceptions.RequestException as e:
-              print(f"Error during requests to {url}: {e}")
-              print("Proceeding without breaking the build.")
-              exit(0)  # Proceed without breaking
-
-          except Exception as e:
-              print(f"An unexpected error occurred: {e}")
-              print("Proceeding without breaking the build.")
-              exit(0)  # Proceed without breaking
+              print(f"An error occurred: {e}")
           EOF
           python3 scrape_checkmarx.py
 
