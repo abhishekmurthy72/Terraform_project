@@ -29,10 +29,15 @@ jobs:
 
       - name: Install dependencies
         run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install beautifulsoup4 requests
+
+      - name: Create and run scrape_checkmarx.py
+        run: |
           cat <<'EOF' > scrape_checkmarx.py
           import requests
           from bs4 import BeautifulSoup
-
+          
           url = "https://eu-status.ast.checkmarx.net/"
           try:
               response = requests.get(url)
