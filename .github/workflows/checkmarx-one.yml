@@ -32,12 +32,12 @@ jobs:
           python3 -m pip install --upgrade pip
           python3 -m pip install beautifulsoup4 requests
 
-      - name: Create and run scrape_checkmarx.py
+      - name: Scrape Checkmarx status
         run: |
           cat <<'EOF' > scrape_checkmarx.py
           import requests
           from bs4 import BeautifulSoup
-          
+
           url = "https://eu-status.ast.checkmarx.net/"
           try:
               response = requests.get(url)
@@ -71,7 +71,6 @@ jobs:
               print(f"An unexpected error occurred: {e}")
               print("Proceeding without breaking the build.")
               exit(0)  # Proceed without breaking
-
           EOF
           python3 scrape_checkmarx.py
 
