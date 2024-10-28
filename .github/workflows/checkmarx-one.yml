@@ -39,7 +39,7 @@ jobs:
           from bs4 import BeautifulSoup
           
           # URL of the status page
-          url = "https://eu-status.ast.checkmarx.net/"
+          url = "https://ind-status.ast.checkmarx.net/"
           
           try:
               # Send a GET request to fetch the HTML content
