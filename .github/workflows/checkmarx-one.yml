@@ -55,6 +55,7 @@ jobs:
               # Check if the status is operational
               if status_element and 'Operating Normally' in status_element.text:
                   print("The status is operational.")
+                  print(status_element.text)
               else:
                   print("The status is not operational.")
           except requests.exceptions.RequestException as e:
