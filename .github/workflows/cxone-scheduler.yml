@@ -1,4 +1,4 @@
-name: Checkmarx Scan
+name: Checkmarx Scheduler
 
 on:
   schedule:
@@ -33,7 +33,7 @@ jobs:
         email=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" https://api.github.com/user | jq -r .email)
         echo "USER_EMAIL=${email}" >> $GITHUB_ENV
       
-    - name: Run Checkmarx Scan
+    - name: Running Checkmarx Scan Scheduler
       env:
         CX_REFRESH_TOKEN: ${{ secrets.CX_API_KEY }}
         CX_PROJECT_ID: ${{ secrets.CX_PROJECT_ID }}
