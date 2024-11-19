@@ -2,7 +2,7 @@ import os
 import requests
 
 def get_access_token(refresh_token, tenant):
-    url = f"https://iam.checkmarx.net/auth/realms/{tenant}/protocol/openid-connect/token"
+    url = f"https://ind.iam.checkmarx.net/auth/realms/{tenant}/protocol/openid-connect/token"
     data = {
         "grant_type": "refresh_token",
         "client_id": "ast-app",
@@ -98,7 +98,7 @@ def main():
         print(payload)
 
         # Send the request to the Checkmarx API
-        response = requests.post('https://ast.checkmarx.net/api/scans', headers=headers, json=payload)
+        response = requests.post('https://ind.ast.checkmarx.net/api/scans', headers=headers, json=payload)
         
         # Log the response status code and content
         print("Response status code:", response.status_code)
