@@ -2,8 +2,8 @@ name: Checkmarx Scheduler
 
 on:
   schedule:
-    - cron: '*/2 * * * *'  # Runs every 3 minutes
-  workflow_dispatch:  # Allows manual triggering of the workflow
+    - cron: '*/5 * * * *'  # Runs every 3 minutes
+  # workflow_dispatch:  # Allows manual triggering of the workflow
 
 jobs:
   checkmarx-scan:
