@@ -50,7 +50,7 @@ def main():
         }
 
         payload = {
-            "type": "git",
+            "type": "upload",
             "handler": {
                 "branch": cx_branch,
                 "repoUrl": cx_repo_url,
@@ -72,8 +72,13 @@ def main():
                 {
                     "type": "sast",
                     "value": {
-                        "incremental": "false"
+                        "incremental": "false",
+                        "presetName": "Default",
+                        "baseBranch": "Terraform-project-1"
                     }
+                },                
+                {
+                    "type": "sast"
                 },
                 {
                     "type": "sca"
