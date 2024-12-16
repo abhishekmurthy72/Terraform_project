@@ -73,7 +73,7 @@ def main():
                     "type": "sast",
                     "value": {
                         "incremental": "false",
-                        "presetName": "Default",
+                        "presetName": "ASA Premium",
                         "baseBranch": "Terraform-project-1"
                     }
                 },
