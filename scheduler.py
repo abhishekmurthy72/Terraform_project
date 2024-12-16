@@ -50,7 +50,7 @@ def main():
         }
 
         payload = {
-            "type": "upload",
+            "type": "git",
             "handler": {
                 "branch": cx_branch,
                 "repoUrl": cx_repo_url,
