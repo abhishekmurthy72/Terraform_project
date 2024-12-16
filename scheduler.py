@@ -76,9 +76,6 @@ def main():
                         "presetName": "Default",
                         "baseBranch": "Terraform-project-1"
                     }
-                },                
-                {
-                    "type": "sast"
                 },
                 {
                     "type": "sca"
