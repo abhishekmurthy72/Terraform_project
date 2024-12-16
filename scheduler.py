@@ -51,6 +51,7 @@ def main():
 
         payload = {
             "type": "git",
+            "origin":"GitHub",
             "handler": {
                 "branch": cx_branch,
                 "repoUrl": cx_repo_url,
