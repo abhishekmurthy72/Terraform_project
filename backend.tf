@@ -6,4 +6,3 @@ terraform {
 
   }
 }
-# This is a test file
