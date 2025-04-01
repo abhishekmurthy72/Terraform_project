@@ -133,7 +133,7 @@ def get_user_details(user_id):
     # Fetch the result
     result = cursor.fetchall()
     
-    # Close the connection
+    # Close the connection test comment
     conn.close()
     
     return result
