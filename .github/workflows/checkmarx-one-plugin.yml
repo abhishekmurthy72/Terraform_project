@@ -7,7 +7,7 @@ on:
       - dev
       - Terraform-project-1
   pull_request:
-    types: [opened, reopened, synchronize]
+    types: [new, opened, reopened, synchronize]
     branches: [ "Terraform-project-1" ]
 
 permissions:
@@ -44,6 +44,13 @@ jobs:
           cx_client_secret: ${{ secrets.SECRET }}
           cx_tenant: ${{ vars.TENANT }}
           additional_params: --report-format sarif --output-path .
+          github_token: ${{ github.token }}
+          repo_name: ${{ github.event.repository.name }}
+          # Organization name to create the Pr comment
+          namespace: ${{ github.repository_owner }}
+          # Pr Number of the pull request that needs the decoration
+          pr_number: ${{ github.event.number }}
+                
 
       # - name: Upload SARIF file
       #   uses: github/codeql-action/upload-sarif@v2
