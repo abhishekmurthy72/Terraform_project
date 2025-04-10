@@ -43,7 +43,7 @@ jobs:
           cx_client_id: ${{ vars.CLIENT_ID }}
           cx_client_secret: ${{ secrets.SECRET }}
           cx_tenant: ${{ vars.TENANT }}
-          additional_params: --report-format sarif --output-path .
+          additional_params: --sast-incremental true --file-filter '!/*'
           # github_token: ${{ github.token }}
           # repo_name: ${{ github.event.repository.name }}
           # # Organization name to create the Pr comment
