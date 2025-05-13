@@ -1,0 +1,30 @@
+name: Checkmarx Security Scan
+ 
+on:
+  push:
+    branches: ['master']
+  pull_request:
+    branches: ['master']
+ 
+jobs:
+  checkmarx:
+    runs-on: [ ag-runner ]
+ 
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+ 
+      - name: Checkmarx CxFlow Scan
+        uses: checkmarx-ts/checkmarx-cxflow-github-action@v2.3
+        with:
+          checkmarx_url: "https://yourrepourl"
+          checkmarx_username: ${{ secrets.CX_USERNAME }}
+          checkmarx_password: ${{ secrets.CX_PASSWORD }}
+          checkmarx_version: 9.6
+          project: ${{ secrets.ECR_REPO_NAME }}
+          repo-url: "https://github.com/reponame"
+          preset: "Checkmarx Default"
+          scanners: "sast"
+          break_build: true
+          github_token: ${{ secrets.PAT }}
+ 
