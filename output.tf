@@ -6,6 +6,6 @@ output "subnet" {
   value = aws_instance.instance1.subnet_id
 }
 
-output "s3_bucket" {
+##output "s3_bucket" {
   value = aws_s3_bucket.abhishekmurthy72_bucket
 }
