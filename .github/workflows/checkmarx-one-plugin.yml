@@ -1,21 +1,27 @@
+
 name: Checkmarx One Code Scanning Alerts
+
 on:
   push:
-    branches: 
+    branches:
       - main
       - master
       - dev
       - Terraform-project-1
   pull_request:
     types: [opened, reopened, synchronize]
-    branches: [ "Terraform-project-1" ]
+    branches:
+      - Terraform-project-1
 
 permissions:
   contents: read
   pull-requests: write
 
+env:
+  SCAN_TYPES: "sca,sast"   # Change to "sast" to skip SCA and resolver install
+
 jobs:
-  build:
+  checkmarx-scan:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
@@ -28,20 +34,169 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Checkmarx One scan
-        uses: checkmarx/ast-github-action@main
-        with:
-          base_uri: https://ind.ast.checkmarx.net
-          cx_client_id: ${{ vars.CLIENT_ID }}
-          cx_client_secret: ${{ secrets.SECRET }}
-          cx_tenant: ${{ vars.TENANT }}
-          scan_params: "--sast-incremental --file-filter \"!*.tf\" --debug"
-          github_token: ${{ github.token }}
-          repo_name: ${{ github.event.repository.name }}
-          namespace: ${{ github.repository_owner }}
-          pr_number: ${{ github.event.number }}
+      # ─────────────────────────────────────────────
+      # INSTALL CHECKMARX CLI — Linux
+      # ─────────────────────────────────────────────
+      - name: Download and Install Checkmarx CLI (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          curl -sL https://github.com/Checkmarx/ast-cli/releases/latest/download/ast-cli_linux_x64.tar.gz -o cx.tar.gz
+          tar -xzf cx.tar.gz
+          chmod +x cx
+          echo "${{ github.workspace }}" >> $GITHUB_PATH
 
+      # ─────────────────────────────────────────────
+      # INSTALL CHECKMARX CLI — Windows
+      # ─────────────────────────────────────────────
+      - name: Download and Install Checkmarx CLI (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          Invoke-WebRequest -Uri "https://github.com/Checkmarx/ast-cli/releases/latest/download/ast-cli_windows_x64.zip" -OutFile "cx.zip"
+          Expand-Archive -Path "cx.zip" -DestinationPath "${{ github.workspace }}" -Force
+          echo "${{ github.workspace }}" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        shell: pwsh
+
+      # ─────────────────────────────────────────────
+      # INSTALL SCA RESOLVER + DEPENDENCIES — Linux
+      # Only runs if SCAN_TYPES includes "sca"
+      # ─────────────────────────────────────────────
+      - name: Download SCA Resolver (Linux)
+        if: runner.os == 'Linux' && contains(env.SCAN_TYPES, 'sca')
+        run: |
+          curl -sL https://sca-downloads.s3.amazonaws.com/cli/latest/ScaResolver-linux64.tar.gz -o ScaResolver.tar.gz
+          tar -xzf ScaResolver.tar.gz
+          chmod +x ScaResolver
+          echo "SCA_RESOLVER_PATH=${{ github.workspace }}/ScaResolver" >> $GITHUB_ENV
+
+      - name: Install Dependencies (Linux)
+        if: runner.os == 'Linux' && contains(env.SCAN_TYPES, 'sca')
+        run: |
+          sudo apt-get update -y
+          # Add your dependency installs below based on your project type
+          # Node.js
+          # sudo apt-get install -y nodejs npm
+          # Python
+          # sudo apt-get install -y python3 python3-pip
+          # Java / Maven
+          # sudo apt-get install -y maven
+          # .NET
+          # sudo apt-get install -y dotnet-sdk-8.0
+          echo "Dependencies installed"
+
+      # ─────────────────────────────────────────────
+      # INSTALL SCA RESOLVER + DEPENDENCIES — Windows
+      # Only runs if SCAN_TYPES includes "sca"
+      # ─────────────────────────────────────────────
+      - name: Download SCA Resolver (Windows)
+        if: runner.os == 'Windows' && contains(env.SCAN_TYPES, 'sca')
+        run: |
+          Invoke-WebRequest -Uri "https://sca-downloads.s3.amazonaws.com/cli/latest/ScaResolver-win64.zip" -OutFile "ScaResolver.zip"
+          Expand-Archive -Path "ScaResolver.zip" -DestinationPath "${{ github.workspace }}\ScaResolver" -Force
+          echo "SCA_RESOLVER_PATH=${{ github.workspace }}\ScaResolver\ScaResolver.exe" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+        shell: pwsh
+
+      - name: Install Dependencies (Windows)
+        if: runner.os == 'Windows' && contains(env.SCAN_TYPES, 'sca')
+        run: |
+          # Add your dependency installs below based on your project type
+          # Node.js  → winget install OpenJS.NodeJS
+          # Python   → winget install Python.Python.3
+          # Java     → winget install Microsoft.OpenJDK.21
+          # .NET     → winget install Microsoft.DotNet.SDK.8
+          echo "Dependencies installed"
+        shell: pwsh
+
+      # ─────────────────────────────────────────────
+      # RUN CHECKMARX SCAN — Linux (with SCA)
+      # ─────────────────────────────────────────────
+      - name: Run Checkmarx Scan with SCA (Linux)
+        if: runner.os == 'Linux' && contains(env.SCAN_TYPES, 'sca')
+        run: |
+          ./cx scan create \
+            --base-uri https://ind.ast.checkmarx.net \
+            --client-id ${{ vars.CLIENT_ID }} \
+            --client-secret ${{ secrets.SECRET }} \
+            --tenant ${{ vars.TENANT }} \
+            --project-name "${{ github.repository }}" \
+            --branch "${{ github.ref_name }}" \
+            --scan-types "${{ env.SCAN_TYPES }}" \
+            --file-filter "!*.tf" \
+            --sca-resolver "${{ env.SCA_RESOLVER_PATH }}" \
+            --sca-resolver-params "--log-level Debug" \
+            -s . \
+            --report-format sarif \
+            --output-name cx_result \
+            --output-path .
+
+      # ─────────────────────────────────────────────
+      # RUN CHECKMARX SCAN — Linux (without SCA)
+      # ─────────────────────────────────────────────
+      - name: Run Checkmarx Scan without SCA (Linux)
+        if: runner.os == 'Linux' && !contains(env.SCAN_TYPES, 'sca')
+        run: |
+          ./cx scan create \
+            --base-uri https://ind.ast.checkmarx.net \
+            --client-id ${{ vars.CLIENT_ID }} \
+            --client-secret ${{ secrets.SECRET }} \
+            --tenant ${{ vars.TENANT }} \
+            --project-name "${{ github.repository }}" \
+            --branch "${{ github.ref_name }}" \
+            --scan-types "${{ env.SCAN_TYPES }}" \
+            --file-filter "!*.tf" \
+            -s . \
+            --report-format sarif \
+            --output-name cx_result \
+            --output-path .
+
+      # ─────────────────────────────────────────────
+      # RUN CHECKMARX SCAN — Windows (with SCA)
+      # ─────────────────────────────────────────────
+      - name: Run Checkmarx Scan with SCA (Windows)
+        if: runner.os == 'Windows' && contains(env.SCAN_TYPES, 'sca')
+        run: |
+          .\cx.exe scan create `
+            --base-uri https://ind.ast.checkmarx.net `
+            --client-id ${{ vars.CLIENT_ID }} `
+            --client-secret ${{ secrets.SECRET }} `
+            --tenant ${{ vars.TENANT }} `
+            --project-name "${{ github.repository }}" `
+            --branch "${{ github.ref_name }}" `
+            --scan-types "${{ env.SCAN_TYPES }}" `
+            --file-filter "!*.tf" `
+            --sca-resolver "${{ env.SCA_RESOLVER_PATH }}" `
+            --sca-resolver-params "--log-level Debug" `
+            -s . `
+            --report-format sarif `
+            --output-name cx_result `
+            --output-path .
+        shell: pwsh
+
+      # ─────────────────────────────────────────────
+      # RUN CHECKMARX SCAN — Windows (without SCA)
+      # ─────────────────────────────────────────────
+      - name: Run Checkmarx Scan without SCA (Windows)
+        if: runner.os == 'Windows' && !contains(env.SCAN_TYPES, 'sca')
+        run: |
+          .\cx.exe scan create `
+            --base-uri https://ind.ast.checkmarx.net `
+            --client-id ${{ vars.CLIENT_ID }} `
+            --client-secret ${{ secrets.SECRET }} `
+            --tenant ${{ vars.TENANT }} `
+            --project-name "${{ github.repository }}" `
+            --branch "${{ github.ref_name }}" `
+            --scan-types "${{ env.SCAN_TYPES }}" `
+            --file-filter "!*.tf" `
+            -s . `
+            --report-format sarif `
+            --output-name cx_result `
+            --output-path .
+        shell: pwsh
+
+      # ─────────────────────────────────────────────
+      # UPLOAD SARIF REPORT
+      # ─────────────────────────────────────────────
       - name: Upload SARIF file
         uses: github/codeql-action/upload-sarif@v3
+        if: always()
         with:
           sarif_file: cx_result.sarif
