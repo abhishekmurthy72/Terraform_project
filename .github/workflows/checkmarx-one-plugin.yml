@@ -35,7 +35,7 @@ jobs:
           cx_client_id: ${{ vars.CLIENT_ID }}
           cx_client_secret: ${{ secrets.SECRET }}
           cx_tenant: ${{ vars.TENANT }}
-          scan_params: "--sast-incremental --file-filter \"!*.tf\""
+          scan_params: "--sast-incremental --file-filter \"!*.tf\" --debug"
           github_token: ${{ github.token }}
           repo_name: ${{ github.event.repository.name }}
           namespace: ${{ github.repository_owner }}
