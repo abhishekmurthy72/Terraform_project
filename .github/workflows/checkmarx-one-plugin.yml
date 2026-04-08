@@ -7,7 +7,7 @@ on:
       - dev
       - Terraform-project-1
   pull_request:
-    types: [new, opened, reopened, synchronize]
+    types: [opened, reopened, synchronize]
     branches: [ "Terraform-project-1" ]
 
 permissions:
@@ -16,25 +16,17 @@ permissions:
 
 jobs:
   build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
     permissions:
       contents: read
       pull-requests: write
 
-    runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      # - name: Check Checkmarx One server health
-      #   run: |
-      #     response=$(curl -s -o /dev/null -w "%{http_code}" https://ind-status.ast.checkmarx.net/)
-      #     if [ "$response" != "200" ]; then
-      #       echo "Checkmarx One server is down. Proceeding without breaking the build."
-      #       exit 0  # Do not fail the build
-      #     else
-      #       echo "Checkmarx One server is healthy. Proceeding with scan."
-      #     fi
 
       - name: Checkmarx One scan
         uses: checkmarx/ast-github-action@main
@@ -43,16 +35,13 @@ jobs:
           cx_client_id: ${{ vars.CLIENT_ID }}
           cx_client_secret: ${{ secrets.SECRET }}
           cx_tenant: ${{ vars.TENANT }}
-          scan_params: "--sast-incremental --file-filter '!*.tf'"
+          scan_params: "--sast-incremental --file-filter \"!*.tf\""
           github_token: ${{ github.token }}
           repo_name: ${{ github.event.repository.name }}
-          # Organization name to create the Pr comment
           namespace: ${{ github.repository_owner }}
-          # Pr Number of the pull request that needs the decoration
           pr_number: ${{ github.event.number }}
-                
 
       - name: Upload SARIF file
-        uses: github/codeql-action/upload-sarif@v2
+        uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: cx_result.sarif
