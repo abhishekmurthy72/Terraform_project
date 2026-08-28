@@ -11,7 +11,7 @@ variable "instance_type_value" {
 }
 
 #variable "instance_type_value" {
- # description = "Default Linux of AMI"
+ # description = "Default Linux of AMI test"
   #type = string
   #default = "t2.micro"
 #}
