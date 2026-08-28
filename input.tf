@@ -4,14 +4,8 @@ variable "ami_value" {
   default = "ami-007020fd9c84e18c7"
 }
 
-variable "instance_type_value" {
+//variable "instance_type_value" {
   description = "Default Linux of AMI"
   type = string
   default = "t2.micro"
 }
-
-#variable "instance_type_value" {
- # description = "Default Linux of AMI"
-  #type = string
-  #default = "t2.micro"
-#}
